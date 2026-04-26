@@ -1,4 +1,4 @@
-# build and test the application with Maven, run checkstyle, generate sonar-scanner report and upload to SonarCloud, then check the Quality Gate status
+# build and test the application code with Maven, run checkstyle, generate sonar-scanner report and upload to SonarCloud, then check the Quality Gate status
 name: vprofile actions
 on: 
   workflow_dispatch:
@@ -52,3 +52,31 @@ jobs:
         #env:
           #SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           #SONAR_HOST_URL: ${{ secrets.SONAR_URL }}
+  # build the docker image, tag it with both "latest" and the GitHub run number, and push to Amazon ECR
+  BUILD_AND_PUSH:
+    needs: Testing
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+
+    - name: Login to Amazon ECR
+      uses: aws-actions/amazon-ecr-login@v2
+
+    - name: Build, tag, and push image to ECR
+      run: |
+        IMAGE_URI=${{ secrets.REGISTRY }}/${{ env.ECR_REPOSITORY }}
+        
+        docker build -t $IMAGE_URI:latest .
+        docker tag $IMAGE_URI:latest $IMAGE_URI:${{ github.run_number }}
+        
+        docker push $IMAGE_URI:latest
+        docker push $IMAGE_URI:${{ github.run_number }}
