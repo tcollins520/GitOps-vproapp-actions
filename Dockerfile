@@ -15,6 +15,7 @@ LABEL "Author"="Tina"
 RUN rm -rf /usr/local/tomcat/webapps/*
 
 # copy the built war file from the first stage to the tomcat webapps default directory
+# we just want the war file, so we specify the path to the war file in the build stage and copy it to the webapps directory in the runtime stage
 COPY --from=build_image vprofile-project/target/vprofile-v2.war /usr/local/tomcat/webapps/ROOT.war
 
 # expose the application on port 8080 and start the tomcat server
