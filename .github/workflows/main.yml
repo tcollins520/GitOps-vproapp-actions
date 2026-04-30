@@ -51,7 +51,7 @@ jobs:
         #env:
           #SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           #SONAR_HOST_URL: ${{ secrets.SONAR_URL }}
-  # build the docker image, tag it with both "latest" and the GitHub run number, and push to Amazon ECR
+  # build the docker image, tag it and the GitHub run number, and push to Amazon ECR
   BUILD_AND_PUSH:
     needs: Testing
     runs-on: ubuntu-latest
