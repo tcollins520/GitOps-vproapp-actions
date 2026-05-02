@@ -7,6 +7,7 @@ RUN mvn install -DskipTests
 
 # in the second stage, we use the tomcat image to run the application
 FROM tomcat:9-jre11
+
 LABEL "Project"="Vprofile"
 LABEL "Author"="Tina"
 
